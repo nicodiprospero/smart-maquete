@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0e0d0b" />
+<title>Painel — Edifício Modelo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg-0:#0e0d0b;
+    --bg-1:#15130f;
+    --surface:#1b1813;
+    --surface-2:#221e17;
+    --hairline:rgba(212,165,116,0.10);
+    --hairline-strong:rgba(212,165,116,0.22);
+    --ink:#f3ece1;
+    --ink-dim:#a89c87;
+    --ink-mute:#6b6151;
+    --gold:#d4a574;
+    --gold-hi:#f0c488;
+    --gold-soft:rgba(240,196,136,0.10);
+    --ok:#7eb874;
+    --err:#d97a6a;
+    --serif:'Fraunces',ui-serif,Georgia,serif;
+    --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  html,body{height:100%}
+  body{
+    font-family:var(--mono);
+    background:var(--bg-0);
+    color:var(--ink);
+    font-size:14px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    background-image:
+      radial-gradient(900px 600px at 18% -8%, rgba(212,165,116,0.08), transparent 60%),
+      radial-gradient(700px 500px at 92% 110%, rgba(212,165,116,0.05), transparent 55%),
+      linear-gradient(180deg, #0e0d0b 0%, #100e0b 100%);
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:
+      linear-gradient(rgba(212,165,116,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212,165,116,0.025) 1px, transparent 1px);
+    background-size:64px 64px;
+    mask-image:radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
+  body > *{position:relative;z-index:1}
+  button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+
+  /* ---------- Reveal ---------- */
+  .reveal{opacity:0;transform:translateY(14px);animation:rise .9s cubic-bezier(.2,.7,.2,1) forwards}
+  .r1{animation-delay:.05s}
+  .r2{animation-delay:.18s}
+  .r3{animation-delay:.30s}
+  .r4{animation-delay:.42s}
+  .r5{animation-delay:.54s}
+  @keyframes rise{to{opacity:1;transform:translateY(0)}}
+
+  /* ---------- Login ---------- */
+  .login-wrap{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+    position:relative;
+  }
+  .login-card{
+    width:100%;max-width:420px;
+    background:var(--surface);
+    border:1px solid var(--hairline);
+    padding:40px 38px 36px;
+    position:relative;
+    animation:rise .9s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .login-card::before{
+    content:"";position:absolute;left:0;top:0;width:36px;height:1px;background:var(--gold);
+  }
+  .login-eyebrow{
+    font-family:var(--mono);font-size:10px;letter-spacing:0.32em;
+    color:var(--ink-mute);text-transform:uppercase;margin-bottom:18px;
+  }
+  .login-card h1{
+    font-family:var(--serif);font-weight:300;
+    font-size:38px;line-height:1.05;letter-spacing:-0.02em;
+    margin-bottom:12px;
+    font-variation-settings:"opsz" 144;
+  }
+  .login-card h1 em{font-style:italic;color:var(--gold);font-weight:400}
+  .login-card p{
+    font-family:var(--mono);font-size:11px;letter-spacing:0.05em;
+    color:var(--ink-dim);margin-bottom:30px;
+  }
+  .field{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+  .field label{
+    font-family:var(--mono);font-size:9.5px;letter-spacing:0.28em;
+    text-transform:uppercase;color:var(--ink-mute);
+  }
+  .input{
+    width:100%;
+    padding:14px 0;
+    background:transparent;
+    color:var(--ink);
+    border:none;
+    border-bottom:1px solid var(--hairline-strong);
+    font-family:var(--serif);font-size:20px;font-weight:300;
+    letter-spacing:0.04em;
+    transition:border-color .25s ease;
+    min-height:48px;
+  }
+  .input:focus{outline:none;border-bottom-color:var(--gold)}
+  .login-err{
+    font-family:var(--mono);font-size:10px;letter-spacing:0.18em;
+    text-transform:uppercase;color:var(--err);
+    min-height:14px;margin-top:6px;
+  }
+  .btn{
+    padding:14px 18px;
+    border:1px solid var(--hairline-strong);
+    background:transparent;
+    font-family:var(--mono);font-size:10px;
+    letter-spacing:0.22em;text-transform:uppercase;
+    min-height:48px;
+    transition:background .2s ease, color .2s ease, border-color .2s ease;
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .btn:hover{background:var(--gold-soft);border-color:var(--gold)}
+  .btn:focus-visible{outline:1px solid var(--gold);outline-offset:2px}
+  .btn.primary{background:var(--gold);color:#1a1410;border-color:var(--gold);font-weight:500}
+  .btn.primary:hover{background:var(--gold-hi);border-color:var(--gold-hi)}
+  .btn.full{width:100%;margin-top:14px}
+  .btn.sm{padding:10px 14px;font-size:9.5px;min-height:38px;letter-spacing:0.22em}
+  .btn.ghost{border-color:transparent}
+  .btn.ghost:hover{background:transparent;color:var(--gold);border-color:transparent}
+  .btn[disabled]{opacity:0.4;cursor:not-allowed}
+  .btn[disabled]:hover{background:transparent;border-color:var(--hairline-strong)}
+
+  /* ---------- App shell ---------- */
+  .app{display:none;flex-direction:column;min-height:100vh}
+  .app.active{display:flex}
+  header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:22px 36px;
+    border-bottom:1px solid var(--hairline);
+    background:linear-gradient(180deg, rgba(14,13,11,0.95) 0%, rgba(14,13,11,0.7) 100%);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    position:sticky;top:0;z-index:10;
+  }
+  .brand{display:flex;align-items:center;gap:18px}
+  .brand-mark{
+    width:30px;height:30px;border:1px solid var(--hairline-strong);
+    display:grid;place-items:center;color:var(--gold);
+    transition:transform .8s cubic-bezier(.2,.8,.2,1);
+  }
+  .brand-mark:hover{transform:rotate(45deg)}
+  .brand-text{display:flex;flex-direction:column;gap:2px;line-height:1.1}
+  .brand-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.28em;text-transform:uppercase;color:var(--ink-mute)}
+  .brand h1{
+    font-family:var(--serif);font-weight:300;font-size:22px;
+    letter-spacing:-0.01em;
+    font-variation-settings:"opsz" 144;
+  }
+  .brand h1 em{font-style:italic;font-weight:400;color:var(--gold)}
+  .header-right{display:flex;align-items:center;gap:24px}
+  .conn{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-mute)}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--err);transition:background .3s ease, box-shadow .3s ease}
+  .dot.ok{background:var(--ok);box-shadow:0 0 0 5px rgba(126,184,116,0.10)}
+  .logo-mark{font-family:var(--mono);font-size:10px;letter-spacing:0.32em;color:var(--ink-mute);text-transform:uppercase}
+  .logo-mark span{color:var(--gold)}
+
+  main{
+    max-width:1240px;width:100%;margin:0 auto;
+    padding:32px 36px 60px;
+    display:flex;flex-direction:column;gap:20px;
+  }
+  @media (max-width:760px){
+    main{padding:24px 18px}
+    header{padding:16px 20px}
+    .login-card{padding:30px 26px}
+    .login-card h1{font-size:30px}
+  }
+
+  /* ---------- Section heading ---------- */
+  .page-head{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    padding:8px 0 24px;
+    border-bottom:1px solid var(--hairline);
+    margin-bottom:6px;
+  }
+  .page-eyebrow{
+    font-family:var(--mono);font-size:10px;letter-spacing:0.32em;
+    text-transform:uppercase;color:var(--ink-mute);margin-bottom:8px;
+  }
+  .page-title{
+    font-family:var(--serif);font-weight:300;
+    font-size:42px;line-height:1.02;letter-spacing:-0.02em;
+    font-variation-settings:"opsz" 144;
+  }
+  .page-title em{font-style:italic;color:var(--gold);font-weight:400}
+  .page-meta{
+    font-family:var(--mono);font-size:10px;letter-spacing:0.22em;
+    text-transform:uppercase;color:var(--ink-mute);text-align:right;
+  }
+  .page-meta b{color:var(--gold);font-weight:400}
+
+  /* ---------- Card ---------- */
+  .card{
+    background:var(--surface);
+    border:1px solid var(--hairline);
+    padding:26px 28px;
+  }
+  .card-head{
+    display:flex;justify-content:space-between;align-items:baseline;
+    margin-bottom:6px;
+  }
+  .card-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.28em;text-transform:uppercase;color:var(--ink-mute)}
+  .card-num{font-family:var(--mono);font-size:10px;color:var(--gold);letter-spacing:0.18em}
+  .card-title{
+    font-family:var(--serif);font-weight:300;font-size:24px;
+    letter-spacing:-0.015em;margin-top:4px;margin-bottom:8px;
+    font-variation-settings:"opsz" 144;
+  }
+  .card-title em{font-style:italic;color:var(--gold);font-weight:400}
+  .card-desc{
+    font-family:var(--mono);font-size:11px;letter-spacing:0.04em;
+    color:var(--ink-dim);margin-bottom:20px;
+  }
+
+  /* ---------- Channels table ---------- */
+  .table-wrap{overflow-x:auto;margin:0 -28px}
+  table{
+    width:100%;border-collapse:collapse;
+    min-width:680px;
+  }
+  th, td{
+    text-align:left;padding:14px 12px;
+    border-bottom:1px solid var(--hairline);
+    vertical-align:middle;
+  }
+  th:first-child, td:first-child{padding-left:28px}
+  th:last-child, td:last-child{padding-right:28px}
+  th{
+    font-family:var(--mono);font-size:9.5px;
+    letter-spacing:0.28em;text-transform:uppercase;
+    color:var(--ink-mute);font-weight:500;
+    border-bottom:1px solid var(--hairline-strong);
+  }
+  td.id{
+    font-family:var(--mono);font-size:11px;color:var(--gold);
+    letter-spacing:0.1em;width:60px;
+  }
+  td.val{
+    font-family:var(--mono);font-size:11px;
+    color:var(--ink-dim);
+    width:80px;letter-spacing:0.05em;
+    font-variant-numeric:tabular-nums;
+  }
+  td.act{text-align:right;width:110px}
+  tr.dirty td.val{color:var(--gold)}
+  tr.dirty td.id::after{content:" •";color:var(--gold)}
+
+  .input-inline{
+    width:100%;
+    background:transparent;
+    border:none;
+    border-bottom:1px solid var(--hairline);
+    color:var(--ink);
+    padding:8px 0;
+    font-family:var(--serif);font-size:16px;font-weight:400;
+    letter-spacing:-0.005em;
+    min-height:36px;
+    transition:border-color .2s ease;
+    font-variation-settings:"opsz" 24;
+  }
+  .input-inline:focus{outline:none;border-bottom-color:var(--gold)}
+  select.input-inline{
+    appearance:none;-webkit-appearance:none;
+    font-family:var(--mono);font-size:11px;
+    letter-spacing:0.18em;text-transform:uppercase;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23d4a574' d='M0 0l5 6 5-6z'/></svg>");
+    background-repeat:no-repeat;background-position:right 4px center;
+    padding-right:20px;
+    color:var(--ink-dim);
+    cursor:pointer;
+  }
+
+  /* ---------- Tour speed ---------- */
+  .tour-display{
+    display:flex;align-items:baseline;gap:18px;
+    margin:6px 0 20px;padding-bottom:18px;
+    border-bottom:1px solid var(--hairline);
+  }
+  .tour-num{
+    font-family:var(--serif);font-weight:300;
+    font-size:72px;line-height:1;letter-spacing:-0.04em;
+    color:var(--gold);
+    font-variation-settings:"opsz" 144;
+    font-variant-numeric:tabular-nums;
+  }
+  .tour-unit{
+    font-family:var(--mono);font-size:11px;letter-spacing:0.22em;
+    text-transform:uppercase;color:var(--ink-mute);
+  }
+  .tour-bounds{
+    margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:2px;
+    font-family:var(--mono);font-size:9.5px;letter-spacing:0.18em;
+    text-transform:uppercase;color:var(--ink-mute);
+  }
+  .tour-bounds b{color:var(--ink-dim);font-weight:400}
+  .tour-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .tour-row input[type="range"]{flex:1;min-width:240px}
+
+  input[type="range"]{
+    -webkit-appearance:none;appearance:none;
+    width:100%;height:30px;background:transparent;cursor:pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track{height:1px;background:var(--hairline-strong)}
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;
+    width:14px;height:14px;border-radius:50%;
+    background:var(--gold);margin-top:-7px;
+    border:2px solid var(--bg-0);
+    box-shadow:0 0 0 1px var(--gold), 0 0 12px rgba(240,196,136,0.4);
+    transition:transform .15s ease;
+  }
+  input[type="range"]:active::-webkit-slider-thumb{transform:scale(1.2)}
+  input[type="range"]::-moz-range-track{height:1px;background:var(--hairline-strong)}
+  input[type="range"]::-moz-range-thumb{
+    width:10px;height:10px;border-radius:50%;background:var(--gold);
+    border:2px solid var(--bg-0);box-shadow:0 0 0 1px var(--gold);
+  }
+  input[type="range"]:focus-visible::-webkit-slider-thumb{
+    box-shadow:0 0 0 1px var(--gold), 0 0 0 5px var(--gold-soft);
+  }
+
+  /* ---------- Test ---------- */
+  .test-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:6px}
+  .progress{
+    flex:1;min-width:220px;height:1px;background:var(--hairline-strong);
+    position:relative;overflow:visible;
+  }
+  .progress > span{
+    position:absolute;left:0;top:0;height:100%;width:0%;
+    background:var(--gold);
+    transition:width .3s cubic-bezier(.2,.7,.2,1);
+    box-shadow:0 0 8px rgba(240,196,136,0.5);
+  }
+  .progress > span::after{
+    content:"";position:absolute;right:0;top:50%;
+    width:8px;height:8px;border-radius:50%;
+    background:var(--gold);transform:translate(50%,-50%);
+    box-shadow:0 0 12px rgba(240,196,136,0.7);
+  }
+  .test-status{
+    font-family:var(--mono);font-size:10px;letter-spacing:0.18em;
+    text-transform:uppercase;color:var(--ink-mute);min-width:160px;
+  }
+  .test-status b{color:var(--gold);font-weight:400}
+
+  /* ---------- Footer ---------- */
+  .footer-actions{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:18px 4px 4px;flex-wrap:wrap;gap:12px;
+  }
+  .footer-actions a{
+    font-family:var(--mono);font-size:10px;letter-spacing:0.22em;
+    text-transform:uppercase;
+    color:var(--ink-dim);text-decoration:none;
+    transition:color .2s ease;
+  }
+  .footer-actions a:hover{color:var(--gold)}
+  .footer-actions a span{color:var(--gold);margin-right:8px}
+
+  /* ---------- Toast ---------- */
+  .toast{
+    position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--surface-2);
+    border:1px solid var(--hairline-strong);
+    padding:12px 22px;
+    font-family:var(--mono);font-size:10px;
+    letter-spacing:0.22em;text-transform:uppercase;
+    color:var(--gold);
+    opacity:0;pointer-events:none;
+    transition:opacity .3s ease, transform .3s ease;
+    z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+  <!-- Login -->
+  <div class="login-wrap" id="loginWrap">
+    <form class="login-card" id="loginForm" autocomplete="off">
+      <div class="login-eyebrow">◆ Acesso Restrito</div>
+      <h1>Painel <em>Administrativo</em></h1>
+      <p>Reservado ao corretor responsável pelo estande.</p>
+      <div class="field">
+        <label for="pw">Senha</label>
+        <input id="pw" class="input" type="password" autocomplete="current-password" required />
+      </div>
+      <div class="login-err" id="loginErr"></div>
+      <button class="btn primary full" type="submit">Entrar →</button>
+    </form>
+  </div>
+
+  <!-- App -->
+  <div class="app" id="app">
+    <header class="reveal r1">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 12V4l5-2 5 2v8" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/>
+            <path d="M5 12V8h4v4" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-eyebrow">Empreendimento</span>
+          <h1>Edifício <em>Modelo</em></h1>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="conn"><span class="dot" id="dot"></span><span id="connText">Conectando</span></div>
+        <span class="logo-mark"><span>◆</span> Smart Maquete</span>
+      </div>
+    </header>
+
+    <main>
+      <div class="page-head reveal r2">
+        <div>
+          <div class="page-eyebrow">Configuração</div>
+          <h2 class="page-title">Painel <em>do corretor</em></h2>
+        </div>
+        <div class="page-meta">Sessão · <b id="sessionId">—</b></div>
+      </div>
+
+      <section class="card reveal r3">
+        <div class="card-head">
+          <span class="card-eyebrow">001 · Canais</span>
+          <span class="card-num" id="chCount">12</span>
+        </div>
+        <div class="card-title"><em>Mapeamento</em> dos canais</div>
+        <div class="card-desc">Renomeie e classifique os doze canais físicos do controlador. Salve por linha para persistir.</div>
+        <div class="table-wrap">
+          <table id="chTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Valor</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="chBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card reveal r4">
+        <div class="card-head">
+          <span class="card-eyebrow">002 · Tour</span>
+          <span class="card-num">↻</span>
+        </div>
+        <div class="card-title"><em>Velocidade</em> do tour</div>
+        <div class="card-desc">Tempo de cada passo entre canais durante a cena tour automático.</div>
+        <div class="tour-display">
+          <span class="tour-num" id="tourNum">800</span>
+          <span class="tour-unit">milissegundos</span>
+          <div class="tour-bounds">
+            <span>Min · <b>300</b></span>
+            <span>Max · <b>2000</b></span>
+          </div>
+        </div>
+        <div class="tour-row">
+          <input type="range" id="tour" min="300" max="2000" step="50" value="800" />
+          <button class="btn sm" id="tourSave">Salvar →</button>
+        </div>
+      </section>
+
+      <section class="card reveal r5">
+        <div class="card-head">
+          <span class="card-eyebrow">003 · Diagnóstico</span>
+          <span class="card-num">↯</span>
+        </div>
+        <div class="card-title"><em>Teste</em> de canais</div>
+        <div class="card-desc">Acende cada canal individualmente em sequência rápida para validar o cabeamento.</div>
+        <div class="test-row">
+          <button class="btn primary sm" id="testStart">Iniciar teste</button>
+          <button class="btn sm" id="testStop" disabled>Parar</button>
+          <div class="progress"><span id="testBar"></span></div>
+          <div class="test-status" id="testStatus">Pronto</div>
+        </div>
+      </section>
+
+      <div class="footer-actions">
+        <a href="/"><span>←</span> Interface principal</a>
+        <button class="btn ghost sm" id="logout">Sair da sessão</button>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  const PASSWORD = 'admin123';
+  const TYPES = ['andar','comum','fachada'];
+
+  const state = {
+    channels: [],
+    tourSpeed: 800,
+    connected: false,
+  };
+
+  const DEFAULT_CHANNELS = [
+    { id:0,  name:'Lobby',           type:'comum',    value:0 },
+    { id:1,  name:'Piscina',         type:'comum',    value:0 },
+    { id:2,  name:'Salão de Festas', type:'comum',    value:0 },
+    { id:3,  name:'Andar 1',         type:'andar',    value:0 },
+    { id:4,  name:'Andar 2',         type:'andar',    value:0 },
+    { id:5,  name:'Andar 3',         type:'andar',    value:0 },
+    { id:6,  name:'Andar 4',         type:'andar',    value:0 },
+    { id:7,  name:'Andar 5',         type:'andar',    value:0 },
+    { id:8,  name:'Andar 6',         type:'andar',    value:0 },
+    { id:9,  name:'Cobertura',       type:'andar',    value:0 },
+    { id:10, name:'Fachada',         type:'fachada',  value:0 },
+    { id:11, name:'Letreiro',        type:'fachada',  value:0 },
+  ];
+  state.channels = DEFAULT_CHANNELS.map(c => ({...c}));
+
+  // ---------- Login ----------
+  const loginForm = document.getElementById('loginForm');
+  const loginWrap = document.getElementById('loginWrap');
+  const app = document.getElementById('app');
+  const loginErr = document.getElementById('loginErr');
+
+  function tryAutoLogin(){
+    if (sessionStorage.getItem('smartmaquete_admin') === '1') showApp();
+  }
+  function showApp(){
+    loginWrap.style.display = 'none';
+    app.classList.add('active');
+    document.getElementById('sessionId').textContent =
+      Math.random().toString(36).slice(2,8).toUpperCase();
+    boot();
+  }
+  loginForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const v = document.getElementById('pw').value;
+    if (v === PASSWORD){
+      sessionStorage.setItem('smartmaquete_admin','1');
+      loginErr.textContent = '';
+      showApp();
+    } else {
+      loginErr.textContent = '◇ Senha incorreta';
+      document.getElementById('pw').value = '';
+    }
+  });
+  document.getElementById('logout').addEventListener('click', () => {
+    sessionStorage.removeItem('smartmaquete_admin');
+    location.reload();
+  });
+
+  // ---------- WS ----------
+  let ws = null, retryTimer = null;
+  function connect(){
+    try { ws = new WebSocket(`ws://${location.host}/ws`); }
+    catch(e){ scheduleRetry(); return; }
+    ws.addEventListener('open',  () => { state.connected = true; updateConn(); });
+    ws.addEventListener('close', () => { state.connected = false; updateConn(); scheduleRetry(); });
+    ws.addEventListener('error', () => { try{ws.close();}catch(_){} });
+    ws.addEventListener('message', ev => {
+      let msg; try { msg = JSON.parse(ev.data); } catch(e){ return; }
+      if (msg && msg.type === 'state') applyState(msg);
+    });
+  }
+  function scheduleRetry(){
+    if (retryTimer) return;
+    retryTimer = setTimeout(() => { retryTimer = null; connect(); }, 2000);
+  }
+  function send(o){ if (ws && ws.readyState === 1){ try{ws.send(JSON.stringify(o));}catch(e){} } }
+
+  function applyState(msg){
+    if (Array.isArray(msg.channels)){
+      msg.channels.forEach(remote => {
+        const local = state.channels.find(c => c.id === remote.id);
+        if (local){
+          local.name  = remote.name  ?? local.name;
+          local.type  = remote.type  ?? local.type;
+          local.value = (typeof remote.value === 'number') ? remote.value : local.value;
+        } else state.channels.push({...remote});
+      });
+    }
+    if (typeof msg.tourSpeed === 'number'){
+      state.tourSpeed = msg.tourSpeed;
+      const sl = document.getElementById('tour');
+      if (sl && document.activeElement !== sl){
+        sl.value = msg.tourSpeed;
+        document.getElementById('tourNum').textContent = msg.tourSpeed;
+      }
+    }
+    renderTable(true);
+  }
+
+  function updateConn(){
+    const dot = document.getElementById('dot');
+    const txt = document.getElementById('connText');
+    if (state.connected){ dot.classList.add('ok'); txt.textContent = 'Online'; }
+    else { dot.classList.remove('ok'); txt.textContent = 'Offline'; }
+  }
+
+  // ---------- Channels table ----------
+  function renderTable(refreshValuesOnly = false){
+    const tbody = document.getElementById('chBody');
+    document.getElementById('chCount').textContent = String(state.channels.length).padStart(2,'0');
+
+    if (refreshValuesOnly && tbody.children.length === state.channels.length){
+      state.channels.forEach((c, i) => {
+        const row = tbody.children[i];
+        if (!row) return;
+        const valCell = row.querySelector('.val');
+        if (valCell) valCell.textContent = pad4(c.value);
+      });
+      return;
+    }
+    tbody.innerHTML = '';
+    state.channels.forEach(c => {
+      const tr = document.createElement('tr');
+      tr.dataset.id = c.id;
+      tr.innerHTML = `
+        <td class="id">${String(c.id).padStart(2,'0')}</td>
+        <td><input class="input-inline name" type="text" value="${escapeAttr(c.name)}" maxlength="32" /></td>
+        <td>
+          <select class="input-inline type">
+            ${TYPES.map(t => `<option value="${t}"${t===c.type?' selected':''}>${t}</option>`).join('')}
+          </select>
+        </td>
+        <td class="val">${pad4(c.value)}</td>
+        <td class="act"><button class="btn sm save" type="button">Salvar</button></td>`;
+      const nameInput = tr.querySelector('.name');
+      const typeInput = tr.querySelector('.type');
+      const saveBtn   = tr.querySelector('.save');
+      const markDirty = () => tr.classList.add('dirty');
+      nameInput.addEventListener('input', markDirty);
+      typeInput.addEventListener('change', markDirty);
+      saveBtn.addEventListener('click', () => {
+        const newName = nameInput.value.trim() || c.name;
+        const newType = typeInput.value;
+        c.name = newName; c.type = newType;
+        send({ action:'renameChannel', channel:c.id, name:newName, kind:newType });
+        tr.classList.remove('dirty');
+        toast(`Canal ${String(c.id).padStart(2,'0')} salvo`);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ---------- Tour ----------
+  const tourSlider = document.getElementById('tour');
+  const tourNum = document.getElementById('tourNum');
+  tourSlider.addEventListener('input', () => { tourNum.textContent = tourSlider.value; });
+  document.getElementById('tourSave').addEventListener('click', () => {
+    const v = parseInt(tourSlider.value, 10);
+    state.tourSpeed = v;
+    send({ action:'setTourSpeed', speed:v });
+    toast(`Tour · ${v} ms`);
+  });
+
+  // ---------- Test ----------
+  let testRunning = false, testTimer = null;
+  const testBar = document.getElementById('testBar');
+  const testStatus = document.getElementById('testStatus');
+  const testStart = document.getElementById('testStart');
+  const testStop  = document.getElementById('testStop');
+
+  testStart.addEventListener('click', () => {
+    if (testRunning) return;
+    testRunning = true;
+    testStart.disabled = true;
+    testStop.disabled = false;
+    send({ action:'allOff' });
+    runTestStep(0);
+  });
+  testStop.addEventListener('click', stopTest);
+
+  function runTestStep(i){
+    if (!testRunning) return;
+    if (i >= state.channels.length){
+      testStatus.innerHTML = '<b>Concluído</b>';
+      testBar.style.width = '100%';
+      send({ action:'allOff' });
+      setTimeout(stopTest, 700);
+      return;
+    }
+    const c = state.channels[i];
+    if (i > 0){
+      send({ action:'setChannel', channel:state.channels[i-1].id, value:0, fade:false });
+    }
+    send({ action:'setChannel', channel:c.id, value:1023, fade:false });
+    testStatus.innerHTML = `Testando · <b>${escapeAttr(c.name)}</b>`;
+    testBar.style.width = `${((i+1)/state.channels.length)*100}%`;
+    testTimer = setTimeout(() => runTestStep(i+1), 450);
+  }
+  function stopTest(){
+    testRunning = false;
+    clearTimeout(testTimer);
+    testStart.disabled = false;
+    testStop.disabled = true;
+    setTimeout(() => {
+      if (!testRunning){
+        testBar.style.width = '0%';
+        testStatus.textContent = 'Pronto';
+      }
+    }, 900);
+  }
+
+  // ---------- Toast ----------
+  let toastTimer = null;
+  function toast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 1600);
+  }
+
+  // ---------- Helpers ----------
+  function escapeAttr(s){
+    return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
+  function pad4(n){ return String(n).padStart(4,'0'); }
+
+  function boot(){
+    renderTable();
+    connect();
+  }
+
+  tryAutoLogin();
+})();
+</script>
+</body>
+</html>
